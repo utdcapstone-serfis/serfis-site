@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OAuth Callback — Serfis</title>
+<style>
+  :root { color-scheme: dark; --bg: #07041A; --surface: #0E0A26; --ink: #F1EEFA; --ink-2: #C9C2DB; --accent: #C084FC; --tint: rgba(144,91,244,.14); --line: rgba(239,239,239,.14); }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink); font-family: -apple-system, "Segoe UI", Roboto, sans-serif; padding: 24px; }
+  .card { max-width: 640px; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  p { color: var(--ink-2); line-height: 1.5; margin: 0 0 20px; }
+  .row { display: grid; gap: 6px; margin-bottom: 18px; }
+  .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .val { background: var(--tint); border-radius: 10px; padding: 12px 14px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; word-break: break-all; user-select: all; }
+  .empty { color: var(--ink-2); font-style: italic; }
+  button { background: var(--accent); color: #0E0A26; border: 0; border-radius: 999px; padding: 10px 18px; font-weight: 600; cursor: pointer; font-size: 14px; }
+  button:active { transform: scale(.97); }
+</head>
+<body>
+  <div class="card">
+    <h1>OAuth callback received</h1>
+    <p>Copy the values below into the token-exchange script. This page only displays what's in the URL — it doesn't send anything anywhere.</p>
+    <div id="params"></div>
+  </div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const container = document.getElementById('params');
+  const entries = [...params.entries()];
+  if (entries.length === 0) {
+    container.innerHTML = '<p class="empty">No parameters in the URL.</p>';
+  } else {
+    for (const [key, value] of entries) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = key;
+      const val = document.createElement('div');
+      val.className = 'val';
+      val.textContent = value;
+      const btn = document.createElement('button');
+      btn.textContent = 'Copy';
+      btn.style.marginTop = '8px';
+      btn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(value); btn.textContent = 'Copied'; }
+        catch { const r = document.createRange(); r.selectNode(val); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); btn.textContent = 'Selected — press Ctrl+C'; }
+      });
+      row.appendChild(label);
+      row.appendChild(val);
+      row.appendChild(btn);
+      container.appendChild(row);
+    }
+  }
+</script>
+</body>
+</html>
